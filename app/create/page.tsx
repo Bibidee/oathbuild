@@ -11,6 +11,7 @@ import { createOath, getExplorerTxUrl } from "@/lib/genlayer/client";
 import JudgeabilityMeter from "@/components/oath/JudgeabilityMeter";
 import ExplorerLink from "@/components/oath/ExplorerLink";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 const schema = z.object({
   title: z.string().min(4, "Title must be more than 3 characters"),
@@ -42,6 +43,7 @@ const STEPS = [
 
 export default function CreatePage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { account, isConnected, connect } = useWallet();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -86,6 +88,7 @@ export default function CreatePage() {
         category: data.category,
       }, account!);
       setTxHash(hash);
+      await queryClient.invalidateQueries({ queryKey: ["all-oaths"] });
       setTimeout(() => router.push("/oaths"), 3000);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Transaction failed");
