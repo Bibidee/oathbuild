@@ -105,7 +105,7 @@ export default function OathDetailPage({ params }: Props) {
                   {appeals.map((ap) => (
                     <div key={ap.appeal_id} className="border border-glass-line rounded-lg p-3 space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-mono text-xs text-witness-gold capitalize">{ap.basis.replace(/_/g, " ")}</span>
+                        <span className="font-mono text-xs text-verdict-gold capitalize">{ap.basis.replace(/_/g, " ")}</span>
                         <span className={`font-mono text-xs ${ap.resolved ? "text-verdict-green" : "text-partial-amber"}`}>
                           {ap.resolved ? "Resolved" : "Pending"}
                         </span>
@@ -131,7 +131,7 @@ export default function OathDetailPage({ params }: Props) {
                             }
                           }}
                           disabled={appealVerdictLoading === ap.appeal_id}
-                          className="flex items-center gap-2 px-3 py-1.5 border border-witness-gold/40 text-witness-gold hover:bg-witness-gold/10 transition-all font-mono text-xs rounded uppercase tracking-wider disabled:opacity-50"
+                          className="flex items-center gap-2 px-3 py-1.5 border border-verdict-gold/40 text-verdict-gold hover:bg-verdict-gold/10 transition-all font-mono text-xs rounded uppercase tracking-wider disabled:opacity-50"
                         >
                           {appealVerdictLoading === ap.appeal_id
                             ? <><Loader2 size={11} className="animate-spin" /> Requesting…</>
