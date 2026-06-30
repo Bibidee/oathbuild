@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Shield, Gavel, Eye, AlertTriangle, Loader2, Link2 } from "lucide-react";
 import { isPastDeadline } from "@/lib/utils";
 import { useWallet } from "@/lib/context/WalletContext";
+import { useQueryClient } from "@tanstack/react-query";
 import { requestVerdict, getExplorerTxUrl } from "@/lib/genlayer/client";
 import ExplorerLink from "./ExplorerLink";
 import type { Oath } from "@/lib/genlayer/types";
@@ -20,6 +21,7 @@ interface Props {
 
 export default function ActionDock({ oath, evidenceCount, onSubmitEvidence, onViewReceipt, onAppeal, onVerdictRequested }: Props) {
   const { account, connect, isConnected } = useWallet();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +34,11 @@ export default function ActionDock({ oath, evidenceCount, onSubmitEvidence, onVi
     try {
       const hash = await requestVerdict(oath.oath_id, account);
       setTxHash(hash);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["oath", oath.oath_id] }),
+        queryClient.invalidateQueries({ queryKey: ["verdict", oath.oath_id] }),
+        queryClient.invalidateQueries({ queryKey: ["all-oaths"] }),
+      ]);
       onVerdictRequested?.();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Transaction failed");

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2 } from "lucide-react";
 import { useWallet } from "@/lib/context/WalletContext";
+import { useQueryClient } from "@tanstack/react-query";
 import { submitAppeal, getExplorerTxUrl } from "@/lib/genlayer/client";
 import ExplorerLink from "./ExplorerLink";
 import type { AppealBasis } from "@/lib/genlayer/types";
@@ -26,6 +27,7 @@ interface Props {
 
 export default function AppealDrawer({ oathId, open, onClose, onSuccess }: Props) {
   const { account, connect, isConnected } = useWallet();
+  const queryClient = useQueryClient();
   const [basis, setBasis] = useState<AppealBasis>("new_evidence");
   const [newEvidenceUrl, setNewEvidenceUrl] = useState("");
   const [argument, setArgument] = useState("");
@@ -43,6 +45,11 @@ export default function AppealDrawer({ oathId, open, onClose, onSuccess }: Props
         account
       );
       setTxHash(hash);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["oath", oathId] }),
+        queryClient.invalidateQueries({ queryKey: ["appeals", oathId] }),
+        queryClient.invalidateQueries({ queryKey: ["all-oaths"] }),
+      ]);
       onSuccess?.();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Transaction failed");

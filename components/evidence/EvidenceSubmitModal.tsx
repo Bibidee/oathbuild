@@ -64,7 +64,11 @@ function EvidenceFormBody({ oathId, onClose, onSuccess }: FormProps) {
         account
       );
       setTxHash(hash);
-      await queryClient.invalidateQueries({ queryKey: ["evidence", oathId] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["evidence", oathId] }),
+        queryClient.invalidateQueries({ queryKey: ["oath", oathId] }),
+        queryClient.invalidateQueries({ queryKey: ["all-oaths"] }),
+      ]);
       onSuccess?.();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Transaction failed");
